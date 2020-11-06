@@ -1,9 +1,9 @@
 import React from 'react';
-import {} from 'react-native';
 
-import LoginScreen from './src/screens/loginScreen';
+import Router from './src/Router';
+
 const App = () => {
-  return <LoginScreen />;
+  return <Router />;
 };
 
 export default App;
