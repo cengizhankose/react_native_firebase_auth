@@ -1,4 +1,5 @@
-import React from 'react';
+import {useNavigation} from '@react-navigation/native';
+import React, {useState} from 'react';
 import {
   View,
   TouchableOpacity,
@@ -8,27 +9,61 @@ import {
   StyleSheet,
 } from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
+import auth from '@react-native-firebase/auth';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const loginScreen = () => {
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+  const navigation = useNavigation();
   return (
     <View style={styles.mainContainer}>
       <View style={styles.headerView}>
-        <Text style={styles.headerText}>Welcome</Text>
-        <Text style={styles.header2Text}>Log in</Text>
+        <Text style={styles.headerText}>Join Us</Text>
+        <Text style={styles.header2Text}>Register</Text>
       </View>
       <View style={styles.formView}>
-        <TextInput style={styles.formInput} placeholder="Name" />
-        <TextInput style={styles.formInput} placeholder="Email" />
+        <TextInput
+          style={styles.formInput}
+          placeholder="Email"
+          onChangeText={(i) => {
+            setEmail(i);
+          }}
+        />
         <TextInput
           style={styles.formInput}
           placeholder="Password"
+          onChangeText={(i) => {
+            setPassword(i);
+          }}
           secureTextEntry
         />
-        <TouchableOpacity style={styles.formButton}>
-          <Text style={styles.formButtonText}>Log in</Text>
+        <TouchableOpacity
+          style={styles.formButton}
+          onPress={() => {
+            console.log('PASSWORD: ', password);
+            console.log('EMAİL: ', email);
+            auth()
+              .createUserWithEmailAndPassword(email, password)
+              .then(() => {
+                console.log('User account created & signed in!');
+                navigation.navigate('Login');
+              })
+              .catch((error) => {
+                if (error.code === 'auth/email-already-in-use') {
+                  console.log('That email address is already in use!');
+                }
+
+                if (error.code === 'auth/invalid-email') {
+                  console.log('That email address is invalid!');
+                }
+
+                console.error(error);
+              });
+          }}>
+          <Text style={styles.formButtonText}>Register</Text>
         </TouchableOpacity>
       </View>
     </View>
