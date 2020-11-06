@@ -7,6 +7,7 @@ import {
   TextInput,
   Dimensions,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
 import auth from '@react-native-firebase/auth';
@@ -53,10 +54,20 @@ const loginScreen = () => {
               })
               .catch((error) => {
                 if (error.code === 'auth/email-already-in-use') {
+                  Alert.alert(
+                    'Email Is In Use',
+                    'That email address is in use!',
+                    [{text: 'OK'}],
+                  );
                   console.log('That email address is already in use!');
                 }
 
                 if (error.code === 'auth/invalid-email') {
+                  Alert.alert(
+                    'Incorrect Email',
+                    'That email address is invalid!',
+                    [{text: 'OK'}],
+                  );
                   console.log('That email address is invalid!');
                 }
 
