@@ -1,4 +1,5 @@
-import React from 'react';
+import {useNavigation} from '@react-navigation/native';
+import React, {useState} from 'react';
 import {
   View,
   TouchableOpacity,
@@ -8,11 +9,15 @@ import {
   StyleSheet,
 } from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
+import auth from '@react-native-firebase/auth';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const loginScreen = () => {
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+  const navigation = useNavigation();
   return (
     <View style={styles.mainContainer}>
       <View style={styles.headerView}>
@@ -20,15 +25,56 @@ const loginScreen = () => {
         <Text style={styles.header2Text}>Log in</Text>
       </View>
       <View style={styles.formView}>
-        <TextInput style={styles.formInput} placeholder="Email" />
+        <TextInput
+          style={styles.formInput}
+          placeholder="Email"
+          onChangeText={(i) => {
+            setEmail(i);
+          }}
+        />
         <TextInput
           style={styles.formInput}
           placeholder="Password"
+          onChangeText={(i) => {
+            setPassword(i);
+          }}
           secureTextEntry
         />
-        <TouchableOpacity style={styles.formButton}>
+        <TouchableOpacity
+          style={styles.formButton}
+          onPress={() => {
+            console.log('PASSWORD: ', password);
+            console.log('EMAİL: ', email);
+            auth()
+              .signInWithEmailAndPassword(email, password)
+              .then(() => {
+                console.log('User account created & signed in!');
+                navigation.navigate('Home');
+              })
+              .catch((error) => {
+                if (error.code === 'auth/email-already-in-use') {
+                  console.log('That email address is already in use!');
+                }
+
+                if (error.code === 'auth/invalid-email') {
+                  console.log('That email address is invalid!');
+                }
+
+                console.error(error);
+              });
+          }}>
           <Text style={styles.formButtonText}>Log in</Text>
         </TouchableOpacity>
+        <Text style={styles.footerText}>
+          Click here to{' '}
+          <Text
+            style={styles.footerTextRegister}
+            onPress={() => {
+              navigation.navigate('Register');
+            }}>
+            REGİSTER
+          </Text>
+        </Text>
       </View>
     </View>
   );
@@ -37,6 +83,17 @@ const loginScreen = () => {
 export default loginScreen;
 
 const styles = StyleSheet.create({
+  footerTextRegister: {
+    fontWeight: 'bold',
+    fontSize: RFPercentage(2),
+    color: '#7D84B2',
+  },
+  footerText: {
+    fontSize: RFPercentage(2),
+    color: 'black',
+    margin: 15,
+    marginLeft: 25,
+  },
   formButtonText: {
     color: '#F9F9ED',
     fontWeight: 'bold',
@@ -69,7 +126,7 @@ const styles = StyleSheet.create({
     fontSize: RFPercentage(6),
     color: '#8E9DCC',
   },
-  formView: {flex: 2, paddingLeft: 30},
+  formView: {flex: 2, paddingLeft: 30, paddingTop: 30},
   headerView: {flex: 1, justifyContent: 'flex-end', paddingLeft: 30},
   mainContainer: {
     flex: 1,
